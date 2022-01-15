@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Layout</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs/dist/tf.min.js"></script>
+<!--        <script src="newjavascript.js" type="text/javascript"></script>-->
+    </head>
+    <body>
+        <script>
+            //Creando el modelo
+            const modelo=tf.sequential();
+            //Creamos una capa oculta
+            const oculta=tf.layers.dense({
+                units:4,
+                inputShape:[2],
+                activation:'sigmoid'
+            });
+            //Mtemos la capa oculta en el modelo
+            modelo.add(oculta);
+            // Creamos la capa de salida
+            const salida=tf.layers.dense({
+                units:1,
+                activation:'sigmoid'
+            });
+            //Metemos la capa de salida en el modelo
+            modelo.add(salida);
+            //Creamos las opciones del sgd
+            const sgdOpciones=tf.train.sgd(0.1);
+            //Compilamos el modelo
+            modelo.compile({
+                //Le asignamos la optimizacion
+                optimizer:sgdOpciones,
+                //Asignamos la forma de reducir la perdida
+                loss:tf.losses.meanSquaredError
+            });
+            
+            const x1=tf.tensor2d([
+                [0,0],
+                [0.2,0.2],
+                [0.4,0.4],
+            ]);
+            const x2=tf.tensor2d([
+                [0.1],
+                [0.3],
+                [0.5],
+            ]);
+            async function intento(){
+                for (i=0;i<500;i++){
+                    const respuesta= await modelo.fit(x1,x2,{shuffle:true,epochs:100});
+                    console.log(respuesta.history.loss[0] );
+                }
+            }
+            intento().then(()=>{
+                const salida=modelo.predict(x1);
+                salida.print();
+            });
+            
+        </script>
+    </body>
+</html>
